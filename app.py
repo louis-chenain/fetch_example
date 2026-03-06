@@ -80,5 +80,26 @@ def add_user():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+@app.route('/user/<int:user_id>', methods=['PUT'])
+def update_user(user_id):
+    data = request.get_json()
+    name = data.get('name')
+    favorites = data.get('Favorites', None)
+    mdp = data.get('mdp')
+    email = data.get('EMAIL', None)
+    editor_pick = data.get('Editor_Pick', '')
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute(
+        "UPDATE users_id SET name=%s, Favorites=%s, mdp=%s, EMAIL=%s, Editor_Pick=%s WHERE id=%s",
+        (name, favorites, mdp, email, editor_pick, user_id)
+    )
+    conn.commit()
+    cursor.close()
+    conn.close()
+
+    return jsonify({"message": "User updated successfully"})
+
 if __name__ == '__main__':
     app.run(debug=True)
