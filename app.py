@@ -101,5 +101,24 @@ def update_user(user_id):
 
     return jsonify({"message": "User updated successfully"})
 
+@app.route('/user/<int:user_id>', methods=['DELETE'])
+def delete_user(user_id):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    cursor.execute("SELECT * FROM users_id WHERE id = %s", (user_id,))
+    user = cursor.fetchone()
+    if not user:
+        cursor.close()
+        conn.close()
+        return jsonify({"error": "User not found"}), 404
+
+    cursor.execute("DELETE FROM users_id WHERE id = %s", (user_id,))
+    conn.commit()
+    cursor.close()
+    conn.close()
+
+    return jsonify({"success": True, "message": f"User {user_id} deleted"})
+
 if __name__ == '__main__':
     app.run(debug=True)
